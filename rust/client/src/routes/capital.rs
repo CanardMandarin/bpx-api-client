@@ -2,7 +2,7 @@ use crate::error::Result;
 use std::collections::HashMap;
 
 use bpx_api_types::{
-    capital::{Balance, Deposit, DepositAddress, RequestWithdrawalPayload, Withdrawal},
+    capital::{Balance, Collateral, Deposit, DepositAddress, RequestWithdrawalPayload, Withdrawal},
     Blockchain,
 };
 
@@ -16,6 +16,8 @@ pub const API_DEPOSITS: &str = "/wapi/v1/capital/deposits";
 pub const API_DEPOSIT_ADDRESS: &str = "/wapi/v1/capital/deposit/address";
 #[doc(hidden)]
 pub const API_WITHDRAWALS: &str = "/wapi/v1/capital/withdrawals";
+#[doc(hidden)]
+pub const API_COLLATERAL: &str = "/api/v1/capital/collateral";
 
 impl BpxClient {
     /// Fetches the account's current balances.
@@ -64,8 +66,8 @@ impl BpxClient {
     }
 
     /// Fetches the subaccount's collateral information.
-    pub async fn get_collateral(&self, subaccount_id: u64) -> Result<Collateral> {
-        let url = format!("{}{}?subaccountId={}", self.base_url, API_COLLATERAL, subaccount_id);
+    pub async fn get_collateral(&self) -> Result<Collateral> {
+        let url = format!("{}{}", self.base_url, API_COLLATERAL);
         let res = self.get(url).await?;
         res.json().await.map_err(Into::into)
     }

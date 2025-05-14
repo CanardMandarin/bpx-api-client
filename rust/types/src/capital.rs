@@ -104,10 +104,8 @@ pub enum WithdrawalStatus {
 }
 
 
-#[derive(Debug, Display, Clone, Copy, Serialize, Deserialize, EnumString, PartialEq, Eq, Hash)]
-#[strum(serialize_all = "camelCase")]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-
 pub struct Collateral {
     pub assets_value: Decimal,
     pub borrow_liability: Decimal,
@@ -124,8 +122,7 @@ pub struct Collateral {
     pub pnl_unrealized: Decimal,
 }
 
-#[derive(Debug, Display, Clone, Copy, Serialize, Deserialize, EnumString, PartialEq, Eq, Hash)]
-#[strum(serialize_all = "camelCase")]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CollateralItem {
     pub symbol: String,
