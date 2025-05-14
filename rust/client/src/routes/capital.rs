@@ -62,4 +62,11 @@ impl BpxClient {
         let res = self.post(endpoint, payload).await?;
         res.json().await.map_err(Into::into)
     }
+
+    /// Fetches the subaccount's collateral information.
+    pub async fn get_collateral(&self, subaccount_id: u64) -> Result<Collateral> {
+        let url = format!("{}{}?subaccountId={}", self.base_url, API_COLLATERAL, subaccount_id);
+        let res = self.get(url).await?;
+        res.json().await.map_err(Into::into)
+    }
 }
