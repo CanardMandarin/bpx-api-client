@@ -11,6 +11,9 @@
 //!
 //! ## Example
 //! ```no_run
+//! # // We depend on tokio only when the `ws` feature is enabled.
+//! # #[cfg(feature = "ws")]
+//! # {
 //! use bpx_api_client::{BACKPACK_API_BASE_URL, BpxClient};
 //!
 //! #[tokio::main]
@@ -27,6 +30,7 @@
 //!         Err(err) => tracing::error!("Error: {:?}", err),
 //!     }
 //! }
+//! # }
 //! ```
 
 use base64::{engine::general_purpose::STANDARD, Engine};
@@ -88,6 +92,7 @@ pub struct BpxClient {
     signer: SigningKey,
     verifier: VerifyingKey,
     base_url: String,
+    #[allow(dead_code)]
     ws_url: Option<String>,
     client: reqwest::Client,
 }
@@ -175,7 +180,7 @@ impl BpxClient {
             let err_text = res.text().await?;
             let err = Error::BpxApiError {
                 status_code: e.status().unwrap_or(StatusCode::INTERNAL_SERVER_ERROR),
-                message: err_text,
+                message: err_text.into(),
             };
             return Err(err);
         }
@@ -215,12 +220,12 @@ impl BpxClient {
     }
 
     /// Returns a reference to the `VerifyingKey` used for request verification.
-    pub fn verifier(&self) -> &VerifyingKey {
+    pub const fn verifier(&self) -> &VerifyingKey {
         &self.verifier
     }
 
     /// Returns a reference to the underlying HTTP client.
-    pub fn client(&self) -> &reqwest::Client {
+    pub const fn client(&self) -> &reqwest::Client {
         &self.client
     }
 }
@@ -255,6 +260,7 @@ impl BpxClient {
             API_RFQ_QUOTE if method == Method::POST => "quoteSubmit",
             API_FUTURES_POSITION if method == Method::GET => "positionQuery",
             API_BORROW_LEND_POSITIONS if method == Method::GET => "borrowLendPositionQuery",
+            API_COLLATERAL if method == Method::GET => "collateralQuery",
             API_ACCOUNT if method == Method::GET => "accountQuery",
             API_ACCOUNT_MAX_BORROW if method == Method::GET => "maxBorrowQuantity",
             API_ACCOUNT_MAX_WITHDRAWAL if method == Method::GET => "maxWithdrawalQuantity",
@@ -279,7 +285,7 @@ impl BpxClient {
                     .into_iter()
                     .map(|(k, v)| (k, v.to_string()))
                     .collect::<BTreeMap<_, _>>(),
-                _ => return Err(Error::InvalidRequest("payload must be a JSON object".to_string())),
+                _ => return Err(Error::InvalidRequest("payload must be a JSON object".into())),
             }
         } else {
             BTreeMap::new()
